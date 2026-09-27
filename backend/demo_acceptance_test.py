@@ -129,7 +129,7 @@ print("[PASS] 14. Non-existent inspection returns 404")
 
 print()
 print("=" * 60)
-print("ALL DEMO ACCEPTANCE TESTS PASSED ✓")
+print("ALL DEMO ACCEPTANCE TESTS PASSED")
 print("=" * 60)
 print()
 print(f"  Frontend  : {UI}")
