@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['Slippage', 'corrosion', 'crack']
+
+roboflow:
+  workspace: roboflow-100
+  project: corrosion-bi3q3
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/roboflow-100/corrosion-bi3q3/dataset/1
