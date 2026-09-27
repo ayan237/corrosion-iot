@@ -24,6 +24,13 @@ logger = logging.getLogger(__name__)
 
 GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
+# Resilient models to try in order if the primary experiences high demand / 503
+FALLBACK_MODELS = [
+    "gemini-3.5-flash-lite",
+    "gemini-flash-latest",
+    "gemini-3.1-flash-lite",
+]
+
 
 def _build_prompt(
     severity: str,
@@ -74,7 +81,7 @@ def predict_ai_solution(
     image_bytes: bytes | None = None,
     api_key: str | None = None,
     model: str | None = None,
-    timeout: float = 12.0,
+    timeout: float = 15.0,
 ) -> dict[str, Any] | None:
     """
     Generate an AI solution plan using Google Gemini API.
@@ -83,11 +90,13 @@ def predict_ai_solution(
     """
     settings = get_settings()
     key = api_key or settings.gemini_api_key
-    model_name = model or settings.gemini_model or "gemini-flash-latest"
 
     if not key or not key.strip():
         logger.debug("Gemini API key not configured; skipping AI solution.")
         return None
+
+    primary_model = model or settings.gemini_model or "gemini-3.5-flash-lite"
+    models_to_try = [primary_model] + [m for m in FALLBACK_MODELS if m != primary_model]
 
     prompt_text = _build_prompt(
         severity=severity,
@@ -114,7 +123,6 @@ def predict_ai_solution(
 
     parts.append({"text": prompt_text})
 
-    url = f"{GEMINI_API_BASE}/{model_name}:generateContent?key={key.strip()}"
     payload = {
         "contents": [{"parts": parts}],
         "generationConfig": {
@@ -123,41 +131,38 @@ def predict_ai_solution(
         },
     }
 
-    try:
-        with httpx.Client(timeout=timeout) as client:
-            resp = client.post(url, json=payload)
-            if resp.status_code != 200:
-                logger.warning(
-                    "Gemini API returned status %d: %s",
-                    resp.status_code,
-                    resp.text[:300],
-                )
-                return None
+    with httpx.Client(timeout=timeout) as client:
+        for m_name in models_to_try:
+            url = f"{GEMINI_API_BASE}/{m_name}:generateContent?key={key.strip()}"
+            try:
+                resp = client.post(url, json=payload)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    candidates = data.get("candidates", [])
+                    if not candidates:
+                        continue
 
-            data = resp.json()
-            candidates = data.get("candidates", [])
-            if not candidates:
-                logger.warning("Gemini returned no candidates.")
-                return None
+                    raw_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                    if not raw_text:
+                        continue
 
-            raw_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-            if not raw_text:
-                logger.warning("Gemini returned empty content text.")
-                return None
+                    solution = json.loads(raw_text)
+                    solution["model_used"] = m_name
+                    return solution
 
-            solution = json.loads(raw_text)
-            solution["model_used"] = model_name
-            return solution
+                elif resp.status_code in (503, 429):
+                    logger.info("Model %s unavailable (%d); trying fallback model...", m_name, resp.status_code)
+                    continue
+                else:
+                    logger.warning("Gemini API error on %s (%d): %s", m_name, resp.status_code, resp.text[:200])
+                    # If permission denied or bad request, don't keep failing on other models
+                    if resp.status_code in (401, 403, 400):
+                        return None
+            except (httpx.TimeoutException, httpx.RequestError) as exc:
+                logger.warning("Network issue calling Gemini model %s: %s", m_name, exc)
+                continue
+            except json.JSONDecodeError as exc:
+                logger.warning("Failed to decode JSON from %s: %s", m_name, exc)
+                continue
 
-    except httpx.TimeoutException:
-        logger.warning("Gemini API request timed out after %.1fs", timeout)
-        return None
-    except httpx.RequestError as exc:
-        logger.warning("Gemini API network error: %s", exc)
-        return None
-    except json.JSONDecodeError as exc:
-        logger.warning("Failed to decode Gemini JSON response: %s", exc)
-        return None
-    except Exception as exc:
-        logger.warning("Unexpected error during Gemini solution prediction: %s", exc)
-        return None
+    return None

@@ -22,6 +22,7 @@ def configure_test_env(tmp_path_factory):
     os.environ["SQLITE_PATH"] = str(tmp / "test.db")
     os.environ["UPLOAD_DIR"] = str(tmp / "uploads")
     os.environ["MONGODB_URI"] = ""
+    os.environ["GEMINI_API_KEY"] = ""  # unit tests run offline; mock tested separately
     # Reset any cached singletons so the test env picks up the new settings
     from app.config import get_settings
     get_settings.cache_clear()

@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     # ── Gemini AI Solution ────────────────────────────────────────────────────
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-flash-latest"
+    gemini_model: str = "gemini-3.5-flash-lite"
 
     # ── File Handling ─────────────────────────────────────────────────────────
     upload_dir: str = "uploads"
