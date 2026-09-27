@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     # "demo"  → mock detector only when explicitly requested (e.g. unit tests)
     inference_mode: str = "real"
 
+    # ── Gemini AI Solution ────────────────────────────────────────────────────
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-flash-latest"
+
     # ── File Handling ─────────────────────────────────────────────────────────
     upload_dir: str = "uploads"
     max_upload_size_mb: int = 10

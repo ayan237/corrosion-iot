@@ -9,6 +9,16 @@ export interface Detection {
 
 export type SeverityLevel = "Low" | "Moderate" | "High" | "Critical";
 
+export interface AISolution {
+  summary: string;
+  immediate_actions?: string[];
+  surface_preparation?: string[];
+  treatment_and_coating?: string[];
+  preventive_schedule?: string;
+  estimated_urgency?: string;
+  model_used?: string;
+}
+
 export interface Inspection {
   inspection_id: string;
   timestamp: string;
@@ -32,6 +42,7 @@ export interface Inspection {
   // Recommendation
   recommendation: string;
   recommendation_disclaimer?: string;
+  ai_solution?: AISolution | null;
 
   // Files
   image_reference?: string | null;

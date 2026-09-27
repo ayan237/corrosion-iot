@@ -13,7 +13,7 @@ Upload Image  →  FastAPI Backend  →  AI Detection (YOLO / Demo)
                                   →  Affected Area Calculation
                                   →  Severity Engine
                                   →  Environmental Context (Temp + Humidity)
-                                  →  Maintenance Recommendation
+                                  →  AI Solution Prediction (Gemini Multimodal / Fallback)
                                   →  SQLite / MongoDB
                                   →  Next.js Dashboard
 ```
@@ -22,7 +22,7 @@ Upload Image  →  FastAPI Backend  →  AI Detection (YOLO / Demo)
 2. Backend validates the image and runs object detection
 3. Detected bounding boxes are used to estimate the affected area
 4. A severity level is assigned based on area, region count, and environmental conditions
-5. A maintenance recommendation is generated
+5. A structured engineering maintenance solution is predicted via Google Gemini AI (with deterministic fallback)
 6. The inspection is stored and displayed in the dashboard and history
 
 ---
@@ -34,6 +34,7 @@ Upload Image  →  FastAPI Backend  →  AI Detection (YOLO / Demo)
 | Frontend | Next.js 16, React, TypeScript, Tailwind CSS, Recharts |
 | Backend | Python 3.13, FastAPI 0.119, Uvicorn |
 | ML / CV | YOLOv8 (Ultralytics) or Demo mode, OpenCV, Pillow, NumPy |
+| AI Planning | Google Gemini 2.5/3.8 Flash (Multimodal Engineering Remediation) |
 | Database | SQLite (default) · MongoDB (optional) |
 
 ---

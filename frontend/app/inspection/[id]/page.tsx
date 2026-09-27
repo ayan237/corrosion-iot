@@ -225,14 +225,123 @@ export default function InspectionDetailPage() {
         </div>
       )}
 
-      {/* Recommendation */}
-      <div className="cyber-card-terminal cyber-chamfer p-5 space-y-2">
-        <h2 className="cyber-label text-[#00ff88]">
-          &gt; Maintenance Recommendation
-        </h2>
-        <p className="text-sm text-[#e0e0e0]">{ins.recommendation}</p>
-        <p className="text-xs text-[#6b7280] italic">{ins.recommendation_disclaimer}</p>
-      </div>
+      {/* Recommendation / AI Solution */}
+      {ins.ai_solution ? (
+        <div className="cyber-card-terminal cyber-chamfer p-6 space-y-5 border-[#00d4ff]/40 neon-glow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2a2a3a] pb-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00ff88] animate-pulse" />
+              <h2 className="cyber-label text-[#00d4ff] text-sm tracking-widest">
+                &gt; AI Predicted Maintenance Solution
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {ins.ai_solution.estimated_urgency && (
+                <span className="text-[10px] font-mono px-2 py-0.5 border border-[#ff00ff]/60 bg-[#ff00ff]/10 text-[#ff00ff] uppercase tracking-wider rounded">
+                  Urgency: {ins.ai_solution.estimated_urgency}
+                </span>
+              )}
+              <span className="text-[10px] font-mono px-2 py-0.5 border border-[#00ff88]/60 bg-[#00ff88]/10 text-[#00ff88] uppercase tracking-wider rounded">
+                Gemini AI
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs uppercase font-label tracking-wider text-[#6b7280]">
+              Executive Action Summary
+            </p>
+            <p className="text-sm text-[#e0e0e0] leading-relaxed">
+              {ins.ai_solution.summary}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            {/* Immediate Actions */}
+            {ins.ai_solution.immediate_actions && ins.ai_solution.immediate_actions.length > 0 && (
+              <div className="cyber-card cyber-chamfer p-4 space-y-2 border-[#ff3366]/30 bg-[#ff3366]/5">
+                <div className="flex items-center gap-2 text-[#ff3366]">
+                  <span className="text-sm">🚨</span>
+                  <h3 className="cyber-label text-xs uppercase tracking-wider">
+                    Immediate Actions
+                  </h3>
+                </div>
+                <ul className="space-y-1.5 list-disc list-inside text-xs text-[#d1d5db]">
+                  {ins.ai_solution.immediate_actions.map((act, idx) => (
+                    <li key={idx} className="leading-snug">{act}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Surface Preparation */}
+            {ins.ai_solution.surface_preparation && ins.ai_solution.surface_preparation.length > 0 && (
+              <div className="cyber-card cyber-chamfer p-4 space-y-2 border-[#ff8c42]/30 bg-[#ff8c42]/5">
+                <div className="flex items-center gap-2 text-[#ff8c42]">
+                  <span className="text-sm">🛠</span>
+                  <h3 className="cyber-label text-xs uppercase tracking-wider">
+                    Surface Preparation
+                  </h3>
+                </div>
+                <ul className="space-y-1.5 list-disc list-inside text-xs text-[#d1d5db]">
+                  {ins.ai_solution.surface_preparation.map((prep, idx) => (
+                    <li key={idx} className="leading-snug">{prep}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Treatment & Protective Coating */}
+            {ins.ai_solution.treatment_and_coating && ins.ai_solution.treatment_and_coating.length > 0 && (
+              <div className="cyber-card cyber-chamfer p-4 space-y-2 border-[#00d4ff]/30 bg-[#00d4ff]/5">
+                <div className="flex items-center gap-2 text-[#00d4ff]">
+                  <span className="text-sm">🛡</span>
+                  <h3 className="cyber-label text-xs uppercase tracking-wider">
+                    Treatment & Coating
+                  </h3>
+                </div>
+                <ul className="space-y-1.5 list-disc list-inside text-xs text-[#d1d5db]">
+                  {ins.ai_solution.treatment_and_coating.map((treat, idx) => (
+                    <li key={idx} className="leading-snug">{treat}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Preventive Schedule */}
+            {ins.ai_solution.preventive_schedule && (
+              <div className="cyber-card cyber-chamfer p-4 space-y-2 border-[#00ff88]/30 bg-[#00ff88]/5">
+                <div className="flex items-center gap-2 text-[#00ff88]">
+                  <span className="text-sm">📅</span>
+                  <h3 className="cyber-label text-xs uppercase tracking-wider">
+                    Preventive Schedule
+                  </h3>
+                </div>
+                <p className="text-xs text-[#d1d5db] leading-relaxed">
+                  {ins.ai_solution.preventive_schedule}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-[#2a2a3a] pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-[#6b7280]">
+            <p className="italic">{ins.recommendation_disclaimer}</p>
+            {ins.ai_solution.model_used && (
+              <span className="font-mono text-[#00d4ff]/80">
+                Model: {ins.ai_solution.model_used}
+              </span>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="cyber-card-terminal cyber-chamfer p-5 space-y-2">
+          <h2 className="cyber-label text-[#00ff88]">
+            &gt; Maintenance Recommendation
+          </h2>
+          <p className="text-sm text-[#e0e0e0]">{ins.recommendation}</p>
+          <p className="text-xs text-[#6b7280] italic">{ins.recommendation_disclaimer}</p>
+        </div>
+      )}
 
       <Disclaimer />
     </div>

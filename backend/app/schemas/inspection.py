@@ -49,6 +49,8 @@ class InspectionResponse(BaseModel):
 
     # Recommendation
     recommendation: str
+    recommendation_disclaimer: str | None = None
+    ai_solution: dict[str, Any] | None = None
 
     # Images
     image_reference: str | None = None

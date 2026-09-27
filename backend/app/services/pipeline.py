@@ -122,7 +122,16 @@ def run_inspection(
         severity_result = severity_for_no_detection()
 
     # ── 7. Recommendation ─────────────────────────────────────────────────
-    rec = get_recommendation(severity_result.level, result.detected)
+    rec = get_recommendation(
+        severity=severity_result.level,
+        detected=result.detected,
+        image_bytes=image_bytes,
+        affected_area=affected_area,
+        temperature=temperature,
+        humidity=humidity,
+        environmental_note=env.note,
+        detections=result.detections,
+    )
 
     # ── 8. Annotate image ─────────────────────────────────────────────────
     try:
@@ -168,6 +177,7 @@ def run_inspection(
         # Recommendation
         "recommendation": rec.recommendation,
         "recommendation_disclaimer": rec.disclaimer,
+        "ai_solution": rec.ai_solution,
 
         # Files
         "image_reference": image_url,
